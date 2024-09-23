@@ -1,6 +1,13 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from src.api import auth
+import sqlalchemy
+from src import database as db
+
+with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
+        for row in result:
+            print(row)
 
 router = APIRouter(
     prefix="/barrels",
