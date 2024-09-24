@@ -12,13 +12,13 @@ Central Coast Cauldrons is the premier ecommerce site for all your alchemical de
 """
 
 app = FastAPI(
-    title="Central Coast Cauldrons",
+    title="Enigmas Tinctures",
     description=description,
-    version="0.0.1",
+    version="0.0.2",
     terms_of_service="http://example.com/terms/",
     contact={
-        "name": "Lucas Pierce",
-        "email": "lupierce@calpoly.edu",
+        "name": "Cody Barriger",
+        "email": "cbarrige@calpoly.edu",
     },
 )
 
