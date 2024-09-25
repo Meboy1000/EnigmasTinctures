@@ -5,12 +5,16 @@ from src.api import auth
 import sqlalchemy
 from src import database as db
 
+
 router = APIRouter(
     prefix="/bottler",
     tags=["bottler"],
     dependencies=[Depends(auth.get_api_key)],
 )
 
+with db.engine.begin() as connection:
+        inventory = connection.execute(sqlalchemy.text(SELECT * FROM global_inventory))
+    
 class PotionInventory(BaseModel):
     potion_type: list[int]
     quantity: int
@@ -32,12 +36,12 @@ def get_bottle_plan():
     # green potion to add.
     # Expressed in integers from 1 to 100 that must sum up to 100.
 
-    # Initial logic: bottle all barrels into red potions.
+    # Updated logic: bottle all barrels into green potions. Do not bottle if out of ml
 
     return [
             {
-                "potion_type": [100, 0, 0, 0],
-                "quantity": 5,
+                "potion_type": [0, 100, 0, 0],
+                "quantity": (inventory[3]//100),
             }
         ]
 
