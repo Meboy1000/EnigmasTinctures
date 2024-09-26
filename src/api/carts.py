@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request  # noqa: F401
 from pydantic import BaseModel
 from src.api import auth
 from enum import Enum
@@ -107,5 +107,7 @@ class CartCheckout(BaseModel):
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
     """ """
-
+    with db.engine.begin() as connection:
+        inv = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory")).first()
+        connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_potions = " + str(inv[2]-1) + ", gold = " + str(inv[4]+50)))
     return {"total_potions_bought": 1, "total_gold_paid": 50}

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from src.api import auth
-import math
+import math  # noqa: F401
 import sqlalchemy
 from src import database as db
 
@@ -15,7 +15,7 @@ router = APIRouter(
 def get_inventory():
     """ """ # Basic inventory reading, not dynamic. Update Later
     with db.engine.begin() as connection:
-        inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
+        inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory")).first()
     
     return {"number_of_potions": inventory[2], "ml_in_barrels": inventory[3], "gold": inventory[4]}
 

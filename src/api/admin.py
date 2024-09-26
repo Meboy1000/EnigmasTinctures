@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, Request
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, Request  # noqa: F401
+from pydantic import BaseModel  # noqa: F401
 from src.api import auth
 import sqlalchemy
 from src import database as db

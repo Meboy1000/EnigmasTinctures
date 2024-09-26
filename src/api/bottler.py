@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from enum import Enum
+from enum import Enum  # noqa: F401
 from pydantic import BaseModel
 from src.api import auth
 import sqlalchemy
@@ -22,10 +22,10 @@ class PotionInventory(BaseModel):
 def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int):
     """ """
     with db.engine.begin() as connection:
-        inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
-        inventory[2] += potions_delivered[0].quantity
-        inventory[3] -= potions_delivered[0].quantity*100
-        connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_potions = " + inventory[2]+ ", num_green_ml = " + inventory[3]))
+        inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory")).first()
+        newpots = inventory[2] + potions_delivered[0].quantity
+        newml = inventory[3] - potions_delivered[0].quantity*100
+        connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_potions = " + str(newpots) + ", num_green_ml = " + str(newml)))
     print(f"potions delievered: {potions_delivered} order_id: {order_id}")
     
     return "OK"
@@ -40,13 +40,13 @@ def get_bottle_plan():
     # green potion to add.
     # Expressed in integers from 1 to 100 that must sum up to 100.
     with db.engine.begin() as connection:
-        inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory"))
+        inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory")).first()[3]
     # Updated logic: bottle all barrels into green potions. Do not bottle if out of ml
-
+    quantity = inventory//100
     return [
             {
                 "potion_type": [0, 100, 0, 0],
-                "quantity": (inventory[3]//100),
+                "quantity": (quantity),
             }
         ]
 

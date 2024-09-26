@@ -1,8 +1,6 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request  # noqa: F401
 from pydantic import BaseModel
 from src.api import auth
-import sqlalchemy
-from src import database as db
 
 router = APIRouter(
     prefix="/info",
