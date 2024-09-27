@@ -12,11 +12,12 @@ def get_catalog():
     """
     with db.engine.begin() as connection:
         quantity = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).first()
+        number : int = quantity[0]
     return [
             {
                 "sku": "GREEN_POTION_0",
                 "name": "green potion",
-                "quantity": quantity[0],
+                "quantity": number,
                 "price": 50,
                 "potion_type": [0, 100, 0, 0],
             }
