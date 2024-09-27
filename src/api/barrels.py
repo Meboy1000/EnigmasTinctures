@@ -27,9 +27,14 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
 
     with db.engine.begin() as connection:
         inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory")).first()    
-        cost = inventory[4] - (barrels_delivered[0].price*barrels_delivered[0].quantity)
-        newml = inventory[3] + (barrels_delivered[0].ml_per_barrel*barrels_delivered[0].quantity)
-        connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_ml = " + str(newml) + ", gold = " + str(cost)))
+        cost = inventory[4]
+        newml = inventory[3]
+        for barrel in barrels_delivered:
+            cost -= barrel.price*barrel.quantity
+            newml += barrel.ml_per_barrel*barrel.quantity
+        connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET num_green_ml = {newml}, gold = {cost}"))
+        print(newml)
+        print(cost)
     return "OK"
 
 # Gets called once a day
@@ -39,12 +44,20 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     print(wholesale_catalog)
 
     with db.engine.begin() as connection:
-        num_pots = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).first()[0]
-            
-    return [
-        {
-            "sku": "SMALL_GREEN_BARREL",
-            "quantity": 1 if num_pots < 10 else 0,
-        }
-    ]
+        inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory")).first()
+        num_pots = inventory[2]
+        gold = inventory[4]
+        price : int
+        for barrel in wholesale_catalog:
+            print (barrel)
+            if barrel.sku == "SMALL_GREEN_BARREL":
+                price = barrel.price
+        if gold > price & num_pots < 10:
+            return [
+                {
+                    "sku": "SMALL_GREEN_BARREL",
+                    "quantity": 1,
+                }
+            ]
+        return []
 
