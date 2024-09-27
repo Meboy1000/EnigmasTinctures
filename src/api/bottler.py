@@ -26,17 +26,17 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
         inventory = connection.execute(sqlalchemy.text("SELECT num_green_potions, num_green_ml FROM global_inventory")).first()
         newpots = inventory[0]
         new_green_ml = inventory[1]
-        new_red_ml = 0
-        new_blue_ml = 0
-        new_dark_ml = 0
+        #new_red_ml = 0
+        #new_blue_ml = 0
+        #new_dark_ml = 0
         for PotionInv in potions_delivered:
             newpots += PotionInv.quantity
-            new_red_ml -= PotionInv.quantity * PotionInv.potion_type[0] 
+            #new_red_ml -= PotionInv.quantity * PotionInv.potion_type[0] 
             new_green_ml -= PotionInv.quantity * PotionInv.potion_type[1]
-            new_blue_ml -= PotionInv.quantity * PotionInv.potion_type[2]
-            new_dark_ml -= PotionInv.quantity * PotionInv.potion_type[3]
+            #new_blue_ml -= PotionInv.quantity * PotionInv.potion_type[2]
+            #new_dark_ml -= PotionInv.quantity * PotionInv.potion_type[3]
         connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET num_green_potions = {newpots}, num_green_ml = {new_green_ml}"))
-    print(f"potions delievered: {potions_delivered} order_id: {order_id}")
+    print(f"potions delievered, order_id: {order_id}")
     
     return "OK"
 
