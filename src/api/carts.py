@@ -111,6 +111,7 @@ class CartCheckout(BaseModel):
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
     """ """
+    print(cart_checkout.payment)
     with db.engine.begin() as connection:
         paid = 0
         quantity = 0
