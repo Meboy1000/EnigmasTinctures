@@ -21,11 +21,21 @@ class PotionInventory(BaseModel):
 @router.post("/deliver/{order_id}")
 def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int):
     """ """
+    print("Delivered" + potions_delivered)
     with db.engine.begin() as connection:
-        inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory")).first()
-        newpots = inventory[2] + potions_delivered[0].quantity
-        newml = inventory[3] - potions_delivered[0].quantity*100
-        connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_potions = " + str(newpots) + ", num_green_ml = " + str(newml)))
+        inventory = connection.execute(sqlalchemy.text("SELECT num_green_potions, num_green_ml FROM global_inventory")).first()
+        newpots = inventory[0]
+        new_green_ml = inventory[1]
+        new_red_ml = 0
+        new_blue_ml = 0
+        new_dark_ml = 0
+        for PotionInv in potions_delivered:
+            newpots += PotionInv.quantity
+            new_red_ml -= PotionInv.quantity * PotionInv.potion_type[0] 
+            new_green_ml -= PotionInv.quantity * PotionInv.potion_type[1]
+            new_blue_ml -= PotionInv.quantity * PotionInv.potion_type[2]
+            new_dark_ml -= PotionInv.quantity * PotionInv.potion_type[3]
+        connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET num_green_potions = {newpots}, num_green_ml = {new_green_ml}"))
     print(f"potions delievered: {potions_delivered} order_id: {order_id}")
     
     return "OK"
@@ -40,15 +50,18 @@ def get_bottle_plan():
     # green potion to add.
     # Expressed in integers from 1 to 100 that must sum up to 100.
     with db.engine.begin() as connection:
-        inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory")).first()[3]
+        inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory")).first()
     # Updated logic: bottle all barrels into green potions. Do not bottle if out of ml
-    quantity = inventory//100
-    return [
-            {
-                "potion_type": [0, 100, 0, 0],
-                "quantity": (quantity),
-            }
-        ]
+        ml = inventory[3]
+        quantity = ml//100
+        if quantity > 0:
+            return [
+                    {
+                        "potion_type": [0, 100, 0, 0],
+                        "quantity": (quantity),
+                    }
+                ]
+        return[]
 
 if __name__ == "__main__":
     print(get_bottle_plan())
