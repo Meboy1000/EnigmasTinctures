@@ -88,7 +88,7 @@ def post_visits(visit_id: int, customers: list[Customer]):
 def create_cart(new_cart: Customer):
     """ """
     with db.engine.begin() as connection:
-        connection.execute(sqlalchemy.text(f"INSERT INTO carts_log (customer_name, character_class, level) VALUES ({new_cart.customer_name},{new_cart.character_class},{new_cart.level})"))
+        connection.execute(sqlalchemy.text(f"INSERT INTO carts_log (customer_name, character_class, level) VALUES (\'{new_cart.customer_name}\',\'{new_cart.character_class}\',{new_cart.level})"))
         id : int = connection.execute(sqlalchemy.text(("SELECT id FROM carts_log")))[-1][0]
     return {"cart_id": id}
 
@@ -101,7 +101,7 @@ class CartItem(BaseModel):
 def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
     """ """
     with db.engine.begin() as connection:
-        connection.execute(sqlalchemy.text(f"INSERT INTO cart_items (cart_id, item_sku, quantity) VALUES ({cart_id},{item_sku},{cart_item.quantity})"))
+        connection.execute(sqlalchemy.text(f"INSERT INTO cart_items (cart_id, item_sku, quantity) VALUES ({cart_id},\'{item_sku}\',{cart_item.quantity})"))
     return "OK"
 
 
