@@ -13,8 +13,8 @@ def get_catalog():
     with db.engine.begin() as connection:
         quantity = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).first()
         number : int = quantity[0]
-        if number < 1:
-            return[]
+        #if number < 1:
+            #return[]
     return [
             {
                 "sku": "GREEN_POTION_0",

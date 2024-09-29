@@ -21,7 +21,6 @@ class PotionInventory(BaseModel):
 @router.post("/deliver/{order_id}")
 def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int):
     """ """
-    print("Delivered" + potions_delivered)
     with db.engine.begin() as connection:
         inventory = connection.execute(sqlalchemy.text("SELECT num_green_potions, num_green_ml FROM global_inventory")).first()
         newpots = inventory[0]
