@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from src.api import auth
 import sqlalchemy
 from src import database as db
-from utils import inv, tools
+from .utils import inv, tools
 
 router = APIRouter(
     prefix="/barrels",
@@ -24,17 +24,15 @@ class Barrel(BaseModel):
 def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
     """ """
     print(f"barrels delievered: {barrels_delivered} order_id: {order_id}")
-
-    with db.engine.begin() as connection:
-        inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory")).first()    
-        cost = inventory[4]
-        newml = inventory[3]
-        for barrel in barrels_delivered:
-            cost -= barrel.price*barrel.quantity
-            newml += barrel.ml_per_barrel*barrel.quantity
-        connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET num_green_ml = {newml}, gold = {cost}"))
-        print(newml)
-        print(cost)
+    ml_total = [0,0,0,0]
+    cost = 0
+    for barrel in barrels_delivered:
+        ml_add = barrel.ml_per_barrel*barrel.quantity
+        update_ml = [i * ml_add for i in barrel.potion_type]
+        ml_total = [ml_total[i] + update_ml[i] for i in range(len(ml_total))]
+        cost -= barrel.price*barrel.quantity
+    inv.update_ml_full(tuple(ml_total))
+    inv.update_gold(cost)
     return "OK"
 
 # Gets called once a day
