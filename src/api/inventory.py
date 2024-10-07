@@ -13,10 +13,8 @@ router = APIRouter(
 
 @router.get("/audit")
 def get_inventory():
-    """ """ # Basic inventory reading, not dynamic. Update Later
-
-    with db.engine.begin() as connection:
-        inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory")).first()
+    """ """ 
+    # final inventory read logic, will work in perpetuity. check for security later.
     total_ml = 0
     ml = inv.get_ml()
     for num in ml:
