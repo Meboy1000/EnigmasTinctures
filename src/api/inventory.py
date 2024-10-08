@@ -28,7 +28,22 @@ def get_capacity_plan():
     Start with 1 capacity for 50 potions and 1 capacity for 10000 ml of potion. Each additional 
     capacity unit costs 1000 gold.
     """
-
+    gold = inv.get_gold()
+    num_pots = inv.get_num_potions()
+    pot_cap = inv.get_potion_cap()
+    if num_pots > (pot_cap//4 * 3) and gold > 1100:
+        return {
+        "potion_capacity": 1,
+        "ml_capacity": 0
+        }
+    num_ml = inv.get_ml()
+    ml_cap = inv.get_ml_cap()
+    if num_ml > (ml_cap//4 * 3) and gold > 1100:
+        return {
+        "potion_capacity": 0,
+        "ml_capacity": 1
+        }
+    
     return {
         "potion_capacity": 0,
         "ml_capacity": 0
@@ -45,5 +60,6 @@ def deliver_capacity_plan(capacity_purchase : CapacityPurchase, order_id: int):
     Start with 1 capacity for 50 potions and 1 capacity for 10000 ml of potion. Each additional 
     capacity unit costs 1000 gold.
     """
+
 
     return "OK"
