@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 import sqlalchemy
 from src import database as db
-
+from .utils import inv
 router = APIRouter()
 
 
@@ -10,17 +10,20 @@ def get_catalog():
     """
     Each unique item combination must have only a single price.
     """
-    with db.engine.begin() as connection:
-        quantity = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).first()
-        number : int = quantity[0]
-        if number < 1:
-            return[]
-    return [
-            {
-                "sku": "GREEN_POTION_0",
-                "name": "green potion",
-                "quantity": number,
-                "price": 50,
-                "potion_type": [0, 100, 0, 0],
-            }
-        ]
+    catalog = []
+    potion_log = inv.get_potions_catalog()
+
+    for potion in potion_log:
+        if potion.quantity != 0:
+            catalog.append([
+                {
+                    "sku": potion.sku,
+                    "name": potion.name,
+                    "quantity": potion.quantity,
+                    "price": potion.price,
+                    "potion_type" : potion.recipe,
+
+                }
+            ])
+
+    return catalog

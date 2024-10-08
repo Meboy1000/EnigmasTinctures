@@ -4,7 +4,7 @@ from src.api import auth
 import math  # noqa: F401
 import sqlalchemy
 from src import database as db
-
+from .utils import inv
 router = APIRouter(
     prefix="/inventory",
     tags=["inventory"],
@@ -13,11 +13,13 @@ router = APIRouter(
 
 @router.get("/audit")
 def get_inventory():
-    """ """ # Basic inventory reading, not dynamic. Update Later
-    with db.engine.begin() as connection:
-        inventory = connection.execute(sqlalchemy.text("SELECT * FROM global_inventory")).first()
-    
-    return {"number_of_potions": inventory[2], "ml_in_barrels": inventory[3], "gold": inventory[4]}
+    """ """ 
+    # final inventory read logic, will work in perpetuity. check for security later.
+    total_ml = 0
+    ml = inv.get_ml()
+    for num in ml:
+        total_ml += num
+    return {"number_of_potions": inv.get_num_potions(), "ml_in_barrels": total_ml, "gold": inv.get_gold()}
 
 # Gets called once a day
 @router.post("/plan")
