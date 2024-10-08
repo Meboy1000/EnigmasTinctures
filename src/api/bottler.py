@@ -52,12 +52,12 @@ def get_bottle_plan():
                 continue
         
         if quantity != 0 and check:
-            plan.append([
+            plan.append(
                 {
                     "potion_type" : potion.recipe,
                     "quantity" : quantity,
                 }
-            ])
+            )
 
 
     return plan
