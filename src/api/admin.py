@@ -22,5 +22,6 @@ def reset():
         connection.execute(sqlalchemy.text("UPDATE capacity SET ml_capacity = 1, potion_capacity = 1 "))
         connection.execute(sqlalchemy.text("DELETE FROM carts_log"))
         connection.execute(sqlalchemy.text("DELETE FROM cart_items"))
+        connection.execute(sqlalchemy.text("DELETE FROM potion_inventory"))
     return "OK"
 
