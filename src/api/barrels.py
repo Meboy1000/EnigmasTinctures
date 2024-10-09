@@ -39,32 +39,36 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
+    plan = []
     print(wholesale_catalog)
     gold = inv.get_gold()
     if gold < 100:
         return[]
     if gold < 400:
-        if inv.get_potions_sku("GREEN_POTION_0").quantity == 0:
-            return [{
+        if inv.get_potions_sku("GREEN_POTION_0").quantity == 0 and gold > 100:
+            plan.append({
                 "sku": "SMALL_GREEN_BARREL",
                 "quantity": 1,
-            }]
-        elif inv.get_potions_sku("RED_POTION_0").quantity == 0:
-            return [{
+            })
+            gold -= 100
+        if inv.get_potions_sku("RED_POTION_0").quantity == 0 and gold > 100:
+            plan.append({
                 "sku": "SMALL_RED_BARREL",
                 "quantity": 1,
-            }]
-        elif inv.get_potions_sku("BLUE_POTION_0").quantity == 0 and gold > 120:
-            return [{
+            })
+            gold -= 100
+        if inv.get_potions_sku("BLUE_POTION_0").quantity == 0 and gold > 120:
+            plan.append({
                 "sku": "SMALL_BLUE_BARREL",
                 "quantity": 1,
-            }]
+            })
+        return plan
         
 
 
     catalog = tools.organizeCatalog(wholesale_catalog)
         
-    plan = []
+    
     
     inventory = inv.get_ml
     goal_ml = inv.get_ml_cap()/4
