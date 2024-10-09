@@ -24,6 +24,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
     for potions in potions_delivered:
         potion = inv.get_potions_type(potions.potion_type)
         inv.update_potions(potion.sku, potions.quantity)
+        inv.update_ml_full([p*(-potion.quantity) for p in potions.potion_type])
     print(f"potions delievered, order_id: {order_id}")
     
     return "OK"
