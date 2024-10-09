@@ -15,7 +15,7 @@ def get_catalog():
 
     for potion in potion_log:
         if potion.quantity != 0:
-            catalog.append([
+            catalog.append(
                 {
                     "sku": potion.sku,
                     "name": potion.name,
@@ -24,6 +24,6 @@ def get_catalog():
                     "potion_type" : potion.recipe,
 
                 }
-            ])
+            )
 
     return catalog
