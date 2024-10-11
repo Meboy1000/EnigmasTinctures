@@ -25,7 +25,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
     inv.update_potions_list(potions_delivered)
     ml_update = [0,0,0,0]
     for potions in potions_delivered:
-        update = [x*(-potions.quantity) for x in potions.potion_type]
+        update = [x*(potions.quantity)*-1 for x in potions.potion_type]
         ml_update = list(map(add, update, ml_update))
     inv.update_ml_full(ml_update)
     print(f"potions delievered, order_id: {order_id}")
