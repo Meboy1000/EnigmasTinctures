@@ -75,7 +75,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     needed = [goal_ml-inventory[0], goal_ml-inventory[1], goal_ml-inventory[2], goal_ml-inventory[3]]
     total_need = sum(needed)
     percents = [(needed[0]/total_need), (needed[1]/total_need), (needed[2]/total_need), (needed[3]/total_need)]
-    budget = [gold*percents[0], gold*percents[1], gold*percents[2], gold*percents[3]]
+    budget = [gold*percents[0], gold*percents[1], gold*percents[2], gold*percents[3], 0]
 
     # redistributes budget if unable to afford anything dark
     if budget[3] < 750:
