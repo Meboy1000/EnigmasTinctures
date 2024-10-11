@@ -70,7 +70,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         
     
     
-    inventory = inv.get_ml
+    inventory = inv.get_ml()
     goal_ml = inv.get_ml_cap()/4
     needed = [goal_ml-inventory[0], goal_ml-inventory[1], goal_ml-inventory[2], goal_ml-inventory[3]]
     total_need = sum(needed)
