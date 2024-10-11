@@ -11,7 +11,11 @@ class Barrel(BaseModel):
     quantity: int
 
 def organizeCatalog(wholesale_catalog : list[Barrel]):
-    no_barrel = Barrel("Empty", 0, [0,0,0,0], 0, 0)
+    no_barrel = Barrel(sku = "Empty",
+                        ml_per_barrel= 0,
+                        potion_type = [0,0,0,0],
+                        price = 0,
+                        quantity = 0)
     red_barrels = [no_barrel,no_barrel,no_barrel,no_barrel]
     green_barrels = [no_barrel,no_barrel,no_barrel,no_barrel]
     blue_barrels = [no_barrel,no_barrel,no_barrel,no_barrel]
@@ -30,13 +34,13 @@ def organizeCatalog(wholesale_catalog : list[Barrel]):
     return catalog
 
 def barrelSizer(barrel_list : list[Barrel], barrel : Barrel):
-    ml = Barrel.ml_per_barrel
+    ml = barrel.ml_per_barrel
     if ml == 200:
-        barrel_list[3] = Barrel
+        barrel_list[3] = barrel
     elif ml == 500:
-        barrel_list[2] = Barrel
+        barrel_list[2] = barrel
     elif ml == 2500:
-        barrel_list[1] = Barrel
+        barrel_list[1] = barrel
     elif ml == 10000:
-        barrel_list[0] = Barrel
+        barrel_list[0] = barrel
     return barrel_list

@@ -118,7 +118,7 @@ def update_potions_list(potions: list[PotionInventory]):
 
 def get_ml_cap():
     with db.engine.begin() as connection:
-        capacity = connection.execute(sqlalchemy.text("SELECT ml_capacity FROM capacity")).first()
+        capacity = connection.execute(sqlalchemy.text("SELECT ml_capacity FROM capacity")).first()[0]
         capacity *= 10000
         return capacity
     

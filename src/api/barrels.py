@@ -70,7 +70,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         
     
     
-    inventory = inv.get_ml
+    inventory = inv.get_ml()
     goal_ml = inv.get_ml_cap()/4
     needed = [goal_ml-inventory[0], goal_ml-inventory[1], goal_ml-inventory[2], goal_ml-inventory[3]]
     total_need = sum(needed)
@@ -87,13 +87,14 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     for x in range(4):
         for barrel in catalog[x]:
             if barrel.price != 0:
-                affordable = min(budget[x] // barrel.price, barrel.quantity, needed[x]//barrel.ml_per_barrel)
+                affordable = int(min(budget[x] // barrel.price, barrel.quantity, needed[x]//barrel.ml_per_barrel))
                 plan.append({
                     "sku": barrel.sku,
                     "quantity": affordable,
                 })
                 budget[x] -= barrel.price*affordable
                 needed[x] -= barrel.ml_per_barrel*affordable
+        budget[x+1] += budget[x]
 
     return plan
 
