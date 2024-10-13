@@ -88,10 +88,11 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         for barrel in catalog[x]:
             if barrel.price != 0:
                 affordable = int(min(budget[x] // barrel.price, barrel.quantity, needed[x]//barrel.ml_per_barrel))
-                plan.append({
-                    "sku": barrel.sku,
-                    "quantity": affordable,
-                })
+                if affordable != 0:
+                    plan.append({
+                        "sku": barrel.sku,
+                        "quantity": affordable,
+                    })
                 budget[x] -= barrel.price*affordable
                 needed[x] -= barrel.ml_per_barrel*affordable
         budget[x+1] += budget[x]
