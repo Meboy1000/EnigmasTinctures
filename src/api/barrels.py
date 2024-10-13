@@ -95,6 +95,6 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 budget[x] -= barrel.price*affordable
                 needed[x] -= barrel.ml_per_barrel*affordable
         budget[x+1] += budget[x]
-
+    print(plan)
     return plan
 
