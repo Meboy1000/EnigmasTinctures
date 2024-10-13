@@ -34,7 +34,7 @@ class Potion(BaseModel):
 def get_potions_sku(sku : str):
     quantity = 0
     with db.engine.begin() as connection:
-        gen = connection.execute(sqlalchemy.text(f"SELECT * FROM potion_types WHERE potion_sku = \'{sku}\'")).first()
+        gen = connection.execute(sqlalchemy.text("SELECT * FROM potion_types WHERE potion_sku = :sku}"), [{"sku": sku}]).first()
         potion_log = connection.execute(sqlalchemy.text(f"SELECT quantity FROM potion_inventory WHERE sku = \'{sku}\'"))
         for entry in potion_log:
             quantity += entry.quantity
@@ -94,6 +94,26 @@ def update_gold(gold : int):
 def update_potions(sku : str, quantity : int):
     with db.engine.begin() as connection:
         connection.execute(sqlalchemy.text(f"INSERT INTO potion_inventory (quantity, sku) VALUES ({quantity}, \'{sku}\')"))
+    return "OK"
+
+class PotionInventory(BaseModel):
+    potion_type: list[int]
+    quantity: int
+
+
+def update_potions_list(potions: list[PotionInventory]):
+    quantities = [p.quantity for p in potions]
+    red_mls = [p.potion_type[0] for p in potions]
+    green_mls = [p.potion_type[1] for p in potions]
+    blue_mls = [p.potion_type[2] for p in potions]
+    dark_mls = [p.potion_type[3] for p in potions]
+    thing = [{"quantity": quantities[x], "red_ml" : red_mls[x], "green_ml": green_mls[x], "blue_ml": blue_mls[x], "dark_ml": dark_mls[x]} for x in range(len(potions))]
+    with db.engine.begin() as connection:
+        connection.execute(sqlalchemy.text("""INSERT INTO potion_inventory (quantity, sku) 
+                                           SELECT :quantity, potion_sku
+                                           FROM potion_types 
+                                           WHERE red_ml = :red_ml AND green_ml = :green_ml AND blue_ml = :blue_ml AND dark_ml = :dark_ml"""),
+                                           thing)
     return "OK"
 
 def get_ml_cap():

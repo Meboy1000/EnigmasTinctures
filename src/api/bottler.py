@@ -1,3 +1,4 @@
+from operator import add
 from fastapi import APIRouter, Depends
 from enum import Enum  # noqa: F401
 from pydantic import BaseModel
@@ -21,10 +22,12 @@ class PotionInventory(BaseModel):
 @router.post("/deliver/{order_id}")
 def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int):
     """ """
+    inv.update_potions_list(potions_delivered)
+    ml_update = [0,0,0,0]
     for potions in potions_delivered:
-        potion = inv.get_potions_type(potions.potion_type)
-        inv.update_potions(potion.sku, potions.quantity)
-        inv.update_ml_full([p*(-potion.quantity) for p in potions.potion_type])
+        update = [x*(potions.quantity)*-1 for x in potions.potion_type]
+        ml_update = list(map(add, update, ml_update))
+    inv.update_ml_full(ml_update)
     print(f"potions delievered, order_id: {order_id}")
     
     return "OK"
