@@ -90,7 +90,7 @@ def create_cart(new_cart: Customer):
     """ """
     print(Customer)
     with db.engine.begin() as connection:
-        id = connection.execute(sqlalchemy.text(f"INSERT INTO carts_log (customer_name, character_class, level) VALUES (\'{new_cart.customer_name}\',\'{new_cart.character_class}\',{new_cart.level}) RETURNING id")).first()[0]
+        id = connection.execute(sqlalchemy.text("INSERT INTO carts_log (customer_name, character_class, level) VALUES (:name, :class, :level) RETURNING id"), {"name": new_cart.customer_name, "class": new_cart.character_class, "level": new_cart.level}).first()[0]
     return {"cart_id": id}
 
 
@@ -103,7 +103,7 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
     """ """
     print(f"id: {cart_id}, sku {item_sku}, quantity: {cart_item.quantity}")
     with db.engine.begin() as connection:
-        connection.execute(sqlalchemy.text(f"INSERT INTO cart_items (cart_id, item_sku, quantity) VALUES ({cart_id},\'{item_sku}\',{cart_item.quantity})"))
+        connection.execute(sqlalchemy.text("INSERT INTO cart_items (cart_id, item_sku, quantity) VALUES (:id, :sku, :quantity)"), {"id": cart_id, "sku": item_sku, "quantity": cart_item.quantity})
     return "OK"
 
 
@@ -117,7 +117,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
     with db.engine.begin() as connection:
         paid = 0
         quantity = 0
-        cart = connection.execute(sqlalchemy.text(f"SELECT cart_id, item_sku, quantity FROM cart_items WHERE cart_id = {cart_id}"))
+        cart = connection.execute(sqlalchemy.text("SELECT cart_id, item_sku, quantity FROM cart_items WHERE cart_id = :id"), {"id": cart_id})
         
         
         for items in cart:
