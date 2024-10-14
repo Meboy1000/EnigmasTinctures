@@ -44,7 +44,7 @@ def get_bottle_plan():
     plan = []
     catalog = inv.get_potions_catalog()
     ml_inv = inv.get_ml()
-    capacity = inv.get_potion_cap
+    capacity = inv.get_potion_cap()
     for potion in catalog:
         quantity = capacity
         # temp logic, for pure color potions
