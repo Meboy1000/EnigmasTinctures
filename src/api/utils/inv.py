@@ -34,7 +34,7 @@ class Potion(BaseModel):
 def get_potions_sku(sku : str):
     quantity = 0
     with db.engine.begin() as connection:
-        gen = connection.execute(sqlalchemy.text("SELECT * FROM potion_types WHERE potion_sku = :sku}"), {"sku": sku}).first()
+        gen = connection.execute(sqlalchemy.text("SELECT * FROM potion_types WHERE potion_sku = :sku"), {"sku": sku}).first()
         potion_log = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE sku = :sku"), {"sku": sku})
         for entry in potion_log:
             quantity += entry.quantity
