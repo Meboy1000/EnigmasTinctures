@@ -21,7 +21,7 @@ class Potion(BaseModel):
 
 def get_potions_sku(sku : str):
     with db.engine.begin() as connection:
-        gen = connection.execute(sqlalchemy.text("SELECT * FROM potion_types WHERE potion_sku = :sku}"), {"sku": sku}).first()
+        gen = connection.execute(sqlalchemy.text("SELECT * FROM potion_types WHERE potion_sku = :sku"), {"sku": sku}).first()
         quantity = connection.execute(sqlalchemy.text("SELECT SUM(quantity) FROM potion_inventory WHERE sku = :sku"), {"sku": sku}).scalar_one()
         potion = Potion(sku = sku, name = gen.potion_name, quantity = quantity, price = gen.price, recipe = (gen.red_ml, gen.green_ml, gen.blue_ml, gen.dark_ml) )
     return potion
