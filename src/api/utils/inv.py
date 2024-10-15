@@ -3,25 +3,13 @@ import sqlalchemy
 from src import database as db
 
 def get_ml():
-    red_ml = 0
-    green_ml = 0
-    blue_ml = 0
-    dark_ml = 0
     with db.engine.begin() as connection:
-        ml_log = connection.execute(sqlalchemy.text("SELECT red_ml, green_ml, blue_ml, dark_ml FROM global_inventory"))
-        for ml in ml_log:
-            red_ml += ml.red_ml
-            green_ml += ml.green_ml
-            blue_ml += ml.blue_ml
-            dark_ml += ml.dark_ml
-    return[red_ml, green_ml, blue_ml, dark_ml]
+        ml_log = connection.execute(sqlalchemy.text("SELECT SUM(red_ml) AS red, SUM(green_ml) AS green, SUM(blue_ml) AS blue, SUM(dark_ml) AS dark FROM global_inventory")).first() 
+    return[ml_log[0], ml_log[1], ml_log[2], ml_log[3]]
 
 def get_gold():
-    gold = 0
     with db.engine.begin() as connection:
-        gold_log = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory"))
-        for g_change in gold_log:
-            gold += g_change.gold
+        gold = connection.execute(sqlalchemy.text("SELECT SUM(gold) FROM global_inventory")).scalar_one
     return gold
 
 class Potion(BaseModel):
@@ -32,12 +20,9 @@ class Potion(BaseModel):
     recipe : tuple[int,int,int,int]
 
 def get_potions_sku(sku : str):
-    quantity = 0
     with db.engine.begin() as connection:
         gen = connection.execute(sqlalchemy.text("SELECT * FROM potion_types WHERE potion_sku = :sku}"), {"sku": sku}).first()
-        potion_log = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE sku = :sku"), {"sku": sku})
-        for entry in potion_log:
-            quantity += entry.quantity
+        quantity = connection.execute(sqlalchemy.text("SELECT SUM(quantity) FROM potion_inventory WHERE sku = :sku"), {"sku": sku}).scalar_one()
         potion = Potion(sku = sku, name = gen.potion_name, quantity = quantity, price = gen.price, recipe = (gen.red_ml, gen.green_ml, gen.blue_ml, gen.dark_ml) )
     return potion
 
@@ -47,12 +32,11 @@ def get_potions_type(type : list[int]):
         potion = Potion(sku = potion_log.potion_sku, name = potion_log.potion_name, quantity = 0, price = potion_log.price, recipe = tuple(type))
     return potion
 
-def get_num_potions_type(type : str):
+def get_num_potions_type(sku : str):
     quantity = 0
     with db.engine.begin() as connection:
-        potion_log = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE sku = :type"), {"type": type})
-        for entry in potion_log:
-            quantity += entry.quantity
+        quantity = connection.execute(sqlalchemy.text("SELECT SUM(quantity) FROM potion_inventory WHERE sku = :type"), {"type": sku}).scalar_one()
+        print(type(quantity))
     return quantity
 
 def get_potions_catalog():
