@@ -36,7 +36,6 @@ def get_num_potions_type(sku : str):
     quantity = 0
     with db.engine.begin() as connection:
         quantity = connection.execute(sqlalchemy.text("SELECT SUM(quantity) FROM potion_inventory WHERE sku = :type"), {"type": sku}).scalar_one()
-        print(type(quantity))
     return quantity
 
 def get_potions_catalog():
@@ -53,9 +52,7 @@ def get_potions_catalog():
 def get_num_potions():
     quantity = 0
     with db.engine.begin() as connection:
-        potion_log = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory"))
-        for entry in potion_log:
-            quantity += entry.quantity
+        quantity = connection.execute(sqlalchemy.text("SELECT SUM(quantity) FROM potion_inventory")).scalar_one()
     return quantity
 
 def update_ml_full(ml_change : tuple[int,int,int,int]):
@@ -66,7 +63,6 @@ def update_ml_full(ml_change : tuple[int,int,int,int]):
 def update_ml_spec(ml_change : int, type : str):
     with db.engine.begin() as connection:
         connection.execute(sqlalchemy.text("INSERT INTO global_inventory (:type) VALUES (:ml)"), {"type": type, "ml": ml_change})
-
     return "OK"
 
 def update_gold(gold : int):
