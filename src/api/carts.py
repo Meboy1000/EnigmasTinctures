@@ -80,6 +80,25 @@ def post_visits(visit_id: int, customers: list[Customer]):
     """
     Which customers visited the shop today?
     """
+    classes = []
+    levels = []
+    numbers = []
+    for person in customers:
+        if person.character_class in classes:
+            x = classes.index(person.character_class)
+            levels[x].append(person.level)
+            numbers[x] += 1
+        else:
+            classes.append(person.character_class)
+            levels.append([person.level])
+            numbers.append(1)
+    print(f"Classes: {classes}")
+    print(f"Levels:  {levels}")
+    print(f"numbers: {numbers}")
+    data = [{"id": visit_id, "class": classes[x], "avg": ((sum(levels[x]))/len(levels[x])), "num": numbers[x] } for x in range(len(classes))]
+    print(data)
+    with db.engine.begin() as connection:
+        connection.execute(sqlalchemy.text("INSERT INTO visits (visit_id, class, lvl_avg, num) VALUES (:id, :class, :avg, :num) "), data)
     print(customers)
 
     return "OK"
