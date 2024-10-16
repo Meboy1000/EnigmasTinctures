@@ -9,7 +9,7 @@ def get_ml():
 
 def get_gold():
     with db.engine.begin() as connection:
-        gold = connection.execute(sqlalchemy.text("SELECT SUM(gold) FROM global_inventory")).scalar_one
+        gold = connection.execute(sqlalchemy.text("SELECT SUM(gold) FROM global_inventory")).scalar_one()
     return gold
 
 class Potion(BaseModel):
@@ -99,11 +99,21 @@ def get_ml_cap():
     with db.engine.begin() as connection:
         capacity = connection.execute(sqlalchemy.text("SELECT ml_capacity FROM capacity")).first()[0]
         capacity *= 10000
-        return capacity
+    return capacity
     
 def get_potion_cap():
     with db.engine.begin() as connection:
         capacity = connection.execute(sqlalchemy.text("SELECT potion_capacity FROM capacity")).first()[0]
         capacity *= 50
-        return capacity
-    
+    return capacity
+
+def get_date_time():
+    with db.engine.begin() as connection:
+        date_time = connection.execute(sqlalchemy.text("SELECT day, hour FROM date_time")).first()
+    return date_time
+
+def get_next_hour():
+    return
+
+def get_top_6(day : str, hour : int):
+    return
