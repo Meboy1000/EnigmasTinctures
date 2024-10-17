@@ -97,15 +97,20 @@ def update_potions_list(potions: list[PotionInventory]):
 
 def get_ml_cap():
     with db.engine.begin() as connection:
-        capacity = connection.execute(sqlalchemy.text("SELECT ml_capacity FROM capacity")).first()[0]
+        capacity = connection.execute(sqlalchemy.text("SELECT SUM(ml_capacity) FROM capacity")).scalar_one()
         capacity *= 10000
     return capacity
     
 def get_potion_cap():
     with db.engine.begin() as connection:
-        capacity = connection.execute(sqlalchemy.text("SELECT potion_capacity FROM capacity")).first()[0]
+        capacity = connection.execute(sqlalchemy.text("SELECT SUM(potion_capacity) FROM capacity")).scalar_one()
         capacity *= 50
     return capacity
+
+def update_capacity(ml : int, pot : int):
+    with db.engine.begin() as connection:
+        connection.execute(sqlalchemy.text("INSERT INTO capacity (ml_capacity, potion_capacity) VALUES (:ml, :pot)"), {"ml": ml, "pot": pot})
+    return "OK"
 
 def get_date_time():
     with db.engine.begin() as connection:
@@ -113,7 +118,29 @@ def get_date_time():
     return date_time
 
 def get_next_hour():
-    return
+    days = ["Edgeday",
+            "Bloomday"
+            "Aracanaday",
+            "Hearthday",
+            "Crownday",
+            "Blesseday",
+            "Soulday"]
+    with db.engine.begin() as connection:
+        date_time = connection.execute(sqlalchemy.text("SELECT day, hour FROM date_time")).first()
+        if (date_time.hour+2) >= 24:
+            for x in range(7):
+                if date_time.hour == days[x]:
+                    date_time.hour = days[x+1]
+        date_time.hour = ((date_time.hour + 2) % 24)
+    return date_time
 
 def get_top_6(day : str, hour : int):
+    with db.engine.begin() as connection:
+        Potions = connection.execute(sqlalchemy.text('''
+                                                     SELECT sku, weight FROM potion_weights
+                                                     JOIN date_time ON date_time.day = potion_weights.day AND date_time.hour = potion_weights.hour
+                                                     ORDER BY weight DESC
+                                                     LIMIT 6
+                                                     ''')).first()
+
     return

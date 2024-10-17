@@ -19,7 +19,9 @@ def get_inventory():
     ml = inv.get_ml()
     for num in ml:
         total_ml += num
-    return {"number_of_potions": inv.get_num_potions(), "ml_in_barrels": total_ml, "gold": inv.get_gold()}
+    return {"number_of_potions": inv.get_num_potions(),
+            "ml_in_barrels": total_ml, 
+            "gold": inv.get_gold()}
 
 # Gets called once a day
 @router.post("/plan")
@@ -60,6 +62,7 @@ def deliver_capacity_plan(capacity_purchase : CapacityPurchase, order_id: int):
     Start with 1 capacity for 50 potions and 1 capacity for 10000 ml of potion. Each additional 
     capacity unit costs 1000 gold.
     """
-
+    inv.update_capacity(capacity_purchase.ml_capacity, capacity_purchase.potion_capacity)
+    inv.update_gold((-1000)*(capacity_purchase.ml_capacity + capacity_purchase.potion_capacity))
 
     return "OK"
