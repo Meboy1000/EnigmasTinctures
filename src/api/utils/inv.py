@@ -35,7 +35,9 @@ def get_potions_type(type : list[int]):
 def get_num_potions_type(sku : str):
     quantity = 0
     with db.engine.begin() as connection:
-        quantity = connection.execute(sqlalchemy.text("SELECT SUM(quantity) FROM potion_inventory WHERE sku = :type"), {"type": sku}).scalar_one()
+        quantity = connection.execute(sqlalchemy.text("SELECT SUM(quantity) FROM potion_inventory WHERE sku = :type"), {"type": sku}).scalar_one_or_none()
+        if quantity is None:
+            quantity = 0
     return quantity
 
 def get_potions_catalog():
@@ -53,6 +55,8 @@ def get_num_potions():
     quantity = 0
     with db.engine.begin() as connection:
         quantity = connection.execute(sqlalchemy.text("SELECT SUM(quantity) FROM potion_inventory")).scalar_one()
+        if quantity is None:
+            quantity = 0
     return quantity
 
 def update_ml_full(ml_change : tuple[int,int,int,int]):
