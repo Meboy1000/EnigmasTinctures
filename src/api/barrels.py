@@ -42,26 +42,29 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     plan = []
     print(wholesale_catalog)
     gold = inv.get_gold()
+    print(gold)
     if gold < 100:
+        print("No Barrels")
         return[]
     if gold < 400:
-        if inv.get_potions_sku("GREEN_POTION_0").quantity == 0 and gold > 100:
+        if inv.get_potions_sku("GREEN_POTION_0").quantity == 0 and gold >= 100:
             plan.append({
                 "sku": "SMALL_GREEN_BARREL",
                 "quantity": 1,
             })
             gold -= 100
-        if inv.get_potions_sku("RED_POTION_0").quantity == 0 and gold > 100:
+        if inv.get_potions_sku("RED_POTION_0").quantity == 0 and gold >= 100:
             plan.append({
                 "sku": "SMALL_RED_BARREL",
                 "quantity": 1,
             })
             gold -= 100
-        if inv.get_potions_sku("BLUE_POTION_0").quantity == 0 and gold > 120:
+        if inv.get_potions_sku("BLUE_POTION_0").quantity == 0 and gold >= 120:
             plan.append({
                 "sku": "SMALL_BLUE_BARREL",
                 "quantity": 1,
             })
+        print(plan)
         return plan
         
 
