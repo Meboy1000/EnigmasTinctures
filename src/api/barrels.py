@@ -46,20 +46,21 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     if gold < 100:
         print("No Barrels")
         return[]
+    inventory = inv.get_ml()
     if gold < 400:
-        if inv.get_potions_sku("GREEN_POTION_0").quantity == 0 and gold >= 100:
+        if inventory[1] == 0 and gold >= 100:
             plan.append({
                 "sku": "SMALL_GREEN_BARREL",
                 "quantity": 1,
             })
             gold -= 100
-        if inv.get_potions_sku("RED_POTION_0").quantity == 0 and gold >= 100:
+        if inventory[0] == 0 and gold >= 100:
             plan.append({
                 "sku": "SMALL_RED_BARREL",
                 "quantity": 1,
             })
             gold -= 100
-        if inv.get_potions_sku("BLUE_POTION_0").quantity == 0 and gold >= 120:
+        if inventory[2] == 0 and gold >= 120:
             plan.append({
                 "sku": "SMALL_BLUE_BARREL",
                 "quantity": 1,
@@ -73,7 +74,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         
     
     
-    inventory = inv.get_ml()
+    
     goal_ml = inv.get_ml_cap()/4
     needed = [goal_ml-inventory[0], goal_ml-inventory[1], goal_ml-inventory[2], goal_ml-inventory[3]]
     total_need = sum(needed)
