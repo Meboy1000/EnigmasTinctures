@@ -33,14 +33,14 @@ def get_capacity_plan():
     gold = inv.get_gold()
     num_pots = inv.get_num_potions()
     pot_cap = inv.get_potion_cap()
-    if num_pots > (pot_cap//4 * 3) and gold > 1100:
+    if num_pots > (pot_cap//4 * 3) and gold >= 1100:
         return {
         "potion_capacity": 1,
         "ml_capacity": 0
         }
-    num_ml = inv.get_ml()
+    num_ml = inv.get_ml_sum()
     ml_cap = inv.get_ml_cap()
-    if num_ml > (ml_cap//4 * 3) and gold > 1100:
+    if num_ml > (ml_cap//4 * 3) and gold >= 1100:
         return {
         "potion_capacity": 0,
         "ml_capacity": 1
