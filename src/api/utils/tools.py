@@ -9,7 +9,7 @@ class Barrel(BaseModel):
     price: int
 
     quantity: int
-
+# organizes barrel catalog by ml type and then by size descending.
 def organizeCatalog(wholesale_catalog : list[Barrel]):
     no_barrel = Barrel(sku = "Empty",
                         ml_per_barrel= 0,
@@ -33,6 +33,7 @@ def organizeCatalog(wholesale_catalog : list[Barrel]):
     catalog = [red_barrels, green_barrels, blue_barrels, dark_barrels]
     return catalog
 
+# organizes list of barrels by amount of ml, not flexible, only easily usable by above method
 def barrelSizer(barrel_list : list[Barrel], barrel : Barrel):
     ml = barrel.ml_per_barrel
     if ml == 200:

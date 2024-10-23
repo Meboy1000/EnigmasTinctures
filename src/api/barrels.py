@@ -43,10 +43,13 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     print(wholesale_catalog)
     gold = inv.get_gold()
     print(gold)
+    # skip unnecessary logic if gold too low
     if gold < 100:
         print("No Barrels")
         return[]
+    
     inventory = inv.get_ml()
+    # basic bootstrap
     if gold < 400:
         if inventory[1] == 0 and gold >= 100:
             plan.append({
@@ -69,12 +72,10 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         return plan
         
 
-
+    # rearrange catalog for easier logic
     catalog = tools.organizeCatalog(wholesale_catalog)
-        
     
-    
-    
+    # distribute goals and budget
     goal_ml = inv.get_ml_cap()/4
     needed = [goal_ml-inventory[0], goal_ml-inventory[1], goal_ml-inventory[2], goal_ml-inventory[3]]
     total_need = sum(needed)
@@ -88,9 +89,13 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         budget[2] += budget[3]//3
         budget[3] = 0 
 
+    # for each type of ingredient
     for x in range(4):
+        # for each barrel of said type, in order from largest to smallest
         for barrel in catalog[x]:
+            # avoids not offered barrels
             if barrel.price != 0:
+                # gets the most of a barrel affordable or purchasable that does not exceed the desired ml
                 affordable = int(min(budget[x] // barrel.price, barrel.quantity, needed[x]//barrel.ml_per_barrel))
                 if affordable != 0:
                     plan.append({
@@ -99,7 +104,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     })
                 budget[x] -= barrel.price*affordable
                 needed[x] -= barrel.ml_per_barrel*affordable
+        # roll extra gold to the next ml type
         budget[x+1] += budget[x]
     print(plan)
     return plan
-
