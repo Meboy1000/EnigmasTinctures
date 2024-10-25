@@ -50,11 +50,13 @@ def get_bottle_plan():
     for potion in catalog:
         quantity = capacity
         # temp logic
-
+        
         check = False
         for x in range(4):
             try:
-                quantity = min(quantity, ml_inv[x]//potion.recipe[x], 10)
+                quantity = min(quantity, ml_inv[x]//potion.recipe[x], max(0,(10-potion.quantity)))
+                print(quantity)
+                print(potion.sku)
                 check = True
             except ZeroDivisionError:
                 continue
