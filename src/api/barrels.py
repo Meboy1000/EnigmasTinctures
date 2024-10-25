@@ -84,11 +84,10 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
     # redistributes budget if unable to afford anything dark
     if budget[3] < 750:
-        budget[0] += budget[3]//3
-        budget[1] += budget[3]//3
-        budget[2] += budget[3]//3
+        budget = [i + budget[3]//3 for i in budget]
         budget[3] = 0 
-
+        needed = [i + needed[3]//4 for i in needed] # keeps buffer but allows ml to go above capacity purchase threshold
+        needed[3] = 0 
     # for each type of ingredient
     for x in range(4):
         # for each barrel of said type, in order from largest to smallest
