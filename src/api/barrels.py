@@ -79,15 +79,17 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     goal_ml = inv.get_ml_cap()/4
     needed = [goal_ml-inventory[0], goal_ml-inventory[1], goal_ml-inventory[2], goal_ml-inventory[3]]
     total_need = sum(needed)
+    print(total_need)
     percents = [(needed[0]/total_need), (needed[1]/total_need), (needed[2]/total_need), (needed[3]/total_need)]
     budget = [gold*percents[0], gold*percents[1], gold*percents[2], gold*percents[3], 0]
-
+    bought = 0
     # redistributes budget if unable to afford anything dark
     if budget[3] < 750:
         budget = [i + budget[3]//3 for i in budget]
         budget[3] = 0 
         needed = [i + needed[3]//4 for i in needed] # keeps buffer but allows ml to go above capacity purchase threshold
         needed[3] = 0 
+    
     # for each type of ingredient
     for x in range(4):
         # for each barrel of said type, in order from largest to smallest
@@ -96,14 +98,18 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             if barrel.price != 0:
                 # gets the most of a barrel affordable or purchasable that does not exceed the desired ml
                 affordable = int(min(budget[x] // barrel.price, barrel.quantity, needed[x]//barrel.ml_per_barrel))
-                if affordable != 0:
+                if affordable != 0 and total_need-(barrel.ml_per_barrel*affordable) > 0:
                     plan.append({
                         "sku": barrel.sku,
                         "quantity": affordable,
                     })
-                budget[x] -= barrel.price*affordable
-                needed[x] -= barrel.ml_per_barrel*affordable
+                    budget[x] -= barrel.price*affordable
+                    needed[x] -= barrel.ml_per_barrel*affordable
+                    total_need -= barrel.ml_per_barrel*affordable
+                    bought += barrel.ml_per_barrel*affordable
+                    print(bought)
         # roll extra gold to the next ml type
         budget[x+1] += budget[x]
     print(plan)
+    print(total_need)
     return plan
