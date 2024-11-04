@@ -15,12 +15,8 @@ router = APIRouter(
 def get_inventory():
     """ """ 
     # final inventory read logic, will work in perpetuity. check for security later.
-    total_ml = 0
-    ml = inv.get_ml()
-    for num in ml:
-        total_ml += num
     return {"number_of_potions": inv.get_num_potions(),
-            "ml_in_barrels": total_ml, 
+            "ml_in_barrels": inv.get_ml_sum(), 
             "gold": inv.get_gold()}
 
 # Gets called once a day
@@ -33,20 +29,38 @@ def get_capacity_plan():
     gold = inv.get_gold()
     num_pots = inv.get_num_potions()
     pot_cap = inv.get_potion_cap()
+    num_ml = inv.get_ml_sum()
+    ml_cap = inv.get_ml_cap()
+    if (ml_cap/10000) > 10 and (pot_cap/50) > 15:
+        return {
+        "potion_capacity": 0,
+        "ml_capacity": 0
+        }
+    if gold > (ml_cap//7):
+        gold_use = max((gold-(ml_cap//8)), min(gold-(((ml_cap/10000)-(pot_cap/50))*1000), (gold//2)))//1000
+        des_pcap = min((gold_use//2), max(0, (15-(pot_cap/50))))
+        des_mcap = min(-(gold_use//(-2)), max(0, 10-(ml_cap/10000)))
+        if gold_use != 0:
+            return{
+            "potion_capacity": des_pcap,
+            "ml_capacity": des_mcap    
+            }
     if num_pots > ((pot_cap//4) * 3) and gold >= 1100:
         return {
         "potion_capacity": 1,
         "ml_capacity": 0
         }
-    num_ml = inv.get_ml_sum()
-    ml_cap = inv.get_ml_cap()
+    
     if num_ml > ((ml_cap//4) * 3) and gold >= 1100:
         return {
         "potion_capacity": 0,
         "ml_capacity": 1
         }
     
-    return
+    return {
+        "potion_capacity": 0,
+        "ml_capacity": 0
+        }
 
 class CapacityPurchase(BaseModel):
     potion_capacity: int
