@@ -83,7 +83,8 @@ def update_gold(gold : int):
 
 def update_potions(sku : str, quantity : int):
     with db.engine.begin() as connection:
-        connection.execute(sqlalchemy.text("INSERT INTO potion_inventory (quantity, sku) VALUES (:quantity, :sku)"), {"quantity" : quantity, "sku": sku})
+        connection.execute(sqlalchemy.text("INSERT INTO potion_inventory (quantity, sku) VALUES (:quantity, :sku)"),
+                            {"quantity" : quantity, "sku": sku})
     return "OK"
 
 class PotionInventory(BaseModel):
@@ -99,11 +100,12 @@ def update_potions_list(potions: list[PotionInventory]):
     dark_mls = [p.potion_type[3] for p in potions]
     table_info = [{"quantity": quantities[x], "red_ml" : red_mls[x], "green_ml": green_mls[x], "blue_ml": blue_mls[x], "dark_ml": dark_mls[x]} for x in range(len(potions))]
     with db.engine.begin() as connection:
-        connection.execute(sqlalchemy.text("""INSERT INTO potion_inventory (quantity, sku) 
-                                           SELECT :quantity, potion_sku
-                                           FROM potion_types 
-                                           WHERE red_ml = :red_ml AND green_ml = :green_ml AND blue_ml = :blue_ml AND dark_ml = :dark_ml"""),
-                                           table_info)
+        connection.execute(sqlalchemy.text("""
+        INSERT INTO potion_inventory (quantity, sku) 
+        SELECT :quantity, potion_sku
+        FROM potion_types 
+        WHERE red_ml = :red_ml AND green_ml = :green_ml AND blue_ml = :blue_ml AND dark_ml = :dark_ml
+        """),table_info)
     return "OK"
 
 def get_ml_cap():
@@ -130,24 +132,21 @@ def get_date_time():
     return date_time
 
 def get_next_hour():
-    days = ["Edgeday",
-            "Bloomday"
-            "Aracanaday",
-            "Hearthday",
-            "Crownday",
-            "Blesseday",
-            "Soulday"]
     with db.engine.begin() as connection:
-        date_time = connection.execute(sqlalchemy.text("SELECT day, hour FROM date_time")).first()
+        date_time = connection.execute(sqlalchemy.text("SELECT day, hour FROM date_time")).one()
         if (date_time.hour+2) >= 24:
-            for x in range(7):
-                if date_time.hour == days[x]:
-                    date_time.hour = days[x+1]
+            date_time.day = (date_time.day % 7)+1
         date_time.hour = ((date_time.hour + 2) % 24)
     return date_time
 
 def get_top_6(day : int, hour : int):
     with db.engine.begin() as connection:
-        connection.execute(sqlalchemy.text("SELECT "))
+        connection.execute(sqlalchemy.text('''
+        SELECT potion_sku FROM potion_types
+        JOIN class_potion ON potion_types.potion_sku = class_potion.sku
+        JOIN class_hour ON class_potion.class = class_hour.class WHERE class_hour = :hour
+        JOIN class_day ON class_potion.class = class_day.class WHERE class_day = :day
+        ORDER BY (class_day.weight * class_hour.weight) 
+                                           '''))
 
     return
