@@ -37,9 +37,9 @@ def get_capacity_plan():
         "ml_capacity": 0
         }
     if gold > (ml_cap//7):
-        gold_use = max((gold-(ml_cap//8)), min(gold-(((ml_cap/10000)-(pot_cap/50))*1000), (gold//2)))//1000
-        des_pcap = min((gold_use//2), max(0, (15-(pot_cap/50))))
-        des_mcap = min(-(gold_use//(-2)), max(0, 10-(ml_cap/10000)))
+        gold_use = max((gold-(ml_cap//8)), min(gold-(((ml_cap//10000)-(pot_cap//50))*1000), (gold//2)))//1000
+        des_pcap = min((gold_use//2), max(0, (15-(pot_cap//50))))
+        des_mcap = min(-(gold_use//(-2)), max(0, 10-(ml_cap//10000)))
         if gold_use != 0:
             return{
             "potion_capacity": des_pcap,
