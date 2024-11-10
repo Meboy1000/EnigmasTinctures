@@ -14,10 +14,12 @@ router = APIRouter(
 @router.get("/audit")
 def get_inventory():
     """ """ 
-    # final inventory read logic, will work in perpetuity. check for security later.
+
+    # final inventory read logic, will work in perpetuity.
     return {"number_of_potions": inv.get_num_potions(),
             "ml_in_barrels": inv.get_ml_sum(), 
-            "gold": inv.get_gold()}
+            "gold": inv.get_gold(),
+            }
 
 # Gets called once a day
 @router.post("/plan")
@@ -26,41 +28,40 @@ def get_capacity_plan():
     Start with 1 capacity for 50 potions and 1 capacity for 10000 ml of potion. Each additional 
     capacity unit costs 1000 gold.
     """
+    plan = {
+        "potion_capacity": 0,
+        "ml_capacity": 0
+        }
     gold = inv.get_gold()
     num_pots = inv.get_num_potions()
     pot_cap = inv.get_potion_cap()
     num_ml = inv.get_ml_sum()
     ml_cap = inv.get_ml_cap()
     if (ml_cap/10000) > 10 and (pot_cap/50) > 15:
-        return {
-        "potion_capacity": 0,
-        "ml_capacity": 0
-        }
-    if gold > (ml_cap//7):
+        print("Capacity maxxed :^)")
+        return plan
+    elif gold > (ml_cap//7):
         gold_use = max((gold-(ml_cap//8)), min(gold-(((ml_cap//10000)-(pot_cap//50))*1000), (gold//2)))//1000
-        des_pcap = min((gold_use//2), max(0, (15-(pot_cap//50))))
-        des_mcap = min(-(gold_use//(-2)), max(0, 10-(ml_cap//10000)))
+        des_pcap = min((gold_use//2), max(0, (15-(pot_cap//50))), 10)
+        des_mcap = min(-(gold_use//(-2)), max(0, 10-(ml_cap//10000)), 10)
         if gold_use != 0:
-            return{
+            plan = {
             "potion_capacity": des_pcap,
             "ml_capacity": des_mcap    
             }
-    if num_pots > ((pot_cap//4) * 3) and gold >= 1100:
-        return {
+    elif num_pots > ((pot_cap//4) * 3) and gold >= 1100:
+        plan = {
         "potion_capacity": 1,
         "ml_capacity": 0
         }
     
-    if num_ml > ((ml_cap//4) * 3) and gold >= 1100:
-        return {
+    elif num_ml > ((ml_cap//4) * 3) and gold >= 1100:
+        plan = {
         "potion_capacity": 0,
         "ml_capacity": 1
         }
-    
-    return {
-        "potion_capacity": 0,
-        "ml_capacity": 0
-        }
+    print(plan)
+    return plan
 
 class CapacityPurchase(BaseModel):
     potion_capacity: int
