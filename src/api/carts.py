@@ -30,6 +30,33 @@ def search_orders(
     sort_col: search_sort_options = search_sort_options.timestamp,
     sort_order: search_sort_order = search_sort_order.desc,
 ):
+    if search_page != "":
+        search_page = int(search_page)
+    else:
+        search_page = 0
+    
+    where1 = ""
+    where2 = ""
+
+    if customer_name != "":
+        where1 = "WHERE LOWER(customer_name) LIKE CONCAT('%', LOWER(:customer_name), '%')"
+    
+    if potion_sku != "":
+        where2 = "WHERE LOWER(potion_types.potion_name) LIKE CONCAT('%', LOWER(:potion_sku), '%')"
+
+    if sort_col == "customer_name":
+        col = "ORDER BY customer_name"
+    elif sort_col == "item_sku":
+        col = "ORDER BY cart_items.item_sku"
+    elif sort_col == "line_item_total":
+        col = "ORDER BY line_item_total"
+    else:
+        col = "ORDER BY timestamp"
+
+    if sort_order == "asc":
+        order_by = col + " ASC"
+    else:
+        order_by = col + " DESC"
     """
     Search for cart line items by customer name and/or potion sku.
 
@@ -54,7 +81,58 @@ def search_orders(
     Your results must be paginated, the max results you can return at any
     time is 5 total line items.
     """
+    if search_page == 0:
+        prev = ""
+    else:
+        prev = f"{max(0, search_page-5)}"   
+    result = {
+        "previous": prev,
+        "next": "",
+        "results": [
+        ],
+    }
+    with db.engine.begin() as connection:
+        info = connection.execute(sqlalchemy.text(f'''
+        SELECT carts_log.id AS id,
+        CONCAT(cart_items.quantity, ' ', potion_types.potion_name) AS item_sku,
+        carts_log.customer_name,
+        cart_items.quantity * potion_types.price AS line_item_total,
+        carts_log.timestamp AS timestamp
+        FROM carts_log
+        JOIN cart_items ON carts_log.id = cart_items.cart_id
+        JOIN potion_types ON cart_items.item_sku = potion_types.potion_sku
+        {where1}
+        {where2}
+        {order_by}
+        LIMIT 5
+        OFFSET :page
 
+                                       '''), {"page": search_page, "customer_name" : customer_name, "potion_sku" : potion_sku})
+        pager = connection.execute(sqlalchemy.text(f'''
+            SELECT COUNT(*) - :page as rows
+            FROM carts_log
+            JOIN cart_items ON carts_log.id = cart_items.cart_id
+            JOIN potion_types ON cart_items.item_sku = potion_types.potion_sku
+            {where1}
+            {where2}
+            '''
+        ), {"page": search_page, "customer_name" : customer_name, "potion_sku" : potion_sku}).scalar_one_or_none()
+        result_list = []
+        for x in info:
+            result_list.append({
+                "line_item_id": x.id,
+                "item_sku": x.item_sku,
+                "customer_name": x.customer_name,
+                "line_item_total": x.line_item_total,
+                "timestamp": x.timestamp,
+            })
+            print(x)
+    print(result)
+    result.update({"results" : result_list})
+    if pager > 5:
+        result.update({"next" : f"{search_page+5}"})
+    
+    return result
     return {
         "previous": "",
         "next": "",
