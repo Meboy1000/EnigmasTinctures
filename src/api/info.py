@@ -16,7 +16,15 @@ class Timestamp(BaseModel):
 @router.post("/current_time")
 def post_time(timestamp: Timestamp):
     print(f"Today is {timestamp.day}\nIt is hour {timestamp.hour}")
+    days = ["Edgeday",
+            "Bloomday"
+            "Aracanaday",
+            "Hearthday",
+            "Crownday",
+            "Blesseday",
+            "Soulday"]
+    day = days.index(timestamp.day)+1
     with db.engine.begin() as connection:
-        connection.execute(sqlalchemy.text("UPDATE date_time SET day = :day, hour = :hour "), {"hour": timestamp.hour, "day": timestamp.day})
+        connection.execute(sqlalchemy.text("UPDATE date_time SET day = :day, hour = :hour "), {"hour": timestamp.hour, "day": day})
     return "OK"
 
