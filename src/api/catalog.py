@@ -25,5 +25,5 @@ def get_catalog():
 
                 }
             )
-
+    catalog = catalog[:6]
     return catalog
