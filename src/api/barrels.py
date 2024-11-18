@@ -42,7 +42,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     plan = []
     print(wholesale_catalog)
     gold = inv.get_gold()
-    print("gold in inventory before barrel purchase:" + gold)
+    print(f"gold in inventory before barrel purchase: {gold}")
     # skip unnecessary logic if gold too low
     if gold < 100:
         print("No Barrels")
