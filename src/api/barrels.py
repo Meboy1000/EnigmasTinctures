@@ -42,7 +42,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     plan = []
     print(wholesale_catalog)
     gold = inv.get_gold()
-    print(gold)
+    print("gold in inventory before barrel purchase:" + gold)
     # skip unnecessary logic if gold too low
     if gold < 100:
         print("No Barrels")
@@ -97,7 +97,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             # avoids not offered barrels
             if barrel.price != 0:
                 # gets the most of a barrel affordable or purchasable that does not exceed the desired ml
-                affordable = int(min(budget[x] // barrel.price, barrel.quantity, needed[x]//barrel.ml_per_barrel))
+                affordable = int(max(min(budget[x] // barrel.price, barrel.quantity, needed[x]//barrel.ml_per_barrel), 0))
                 if affordable != 0 and total_need-(barrel.ml_per_barrel*affordable) > 0:
                     plan.append({
                         "sku": barrel.sku,
