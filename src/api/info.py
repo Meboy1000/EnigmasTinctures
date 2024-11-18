@@ -17,7 +17,7 @@ class Timestamp(BaseModel):
 def post_time(timestamp: Timestamp):
     print(f"Today is {timestamp.day}\nIt is hour {timestamp.hour}")
     days = ["Edgeday",
-            "Bloomday"
+            "Bloomday",
             "Arcanaday",
             "Hearthday",
             "Crownday",
