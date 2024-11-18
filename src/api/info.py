@@ -18,7 +18,7 @@ def post_time(timestamp: Timestamp):
     print(f"Today is {timestamp.day}\nIt is hour {timestamp.hour}")
     days = ["Edgeday",
             "Bloomday"
-            "Aracanaday",
+            "Arcanaday",
             "Hearthday",
             "Crownday",
             "Blesseday",
